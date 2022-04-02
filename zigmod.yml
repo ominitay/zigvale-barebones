@@ -4,6 +4,6 @@ license: MIT
 description: A minimal kernel example to demonstrate basic use of the Zigvale library.
 root_dependencies:
   - src: git https://github.com/Ominitay/zigvale
-  - src: git https://github.com/limine-bootloader/limine branch-latest-binary
+  - src: git https://github.com/limine-bootloader/limine branch-v2.0-branch-binary
     id: limine
     keep: true
