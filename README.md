@@ -6,7 +6,7 @@ To build this, you will need a recent build of Zig, and the `zigmod` package man
 
 ``` sh
 # Fetch Zigvale & Limine bootloader
-zigmod fetch
+zigmod ci
 
 # Build the kernel
 zig build iso
