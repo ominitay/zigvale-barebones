@@ -10,7 +10,9 @@ export var stack_bytes: [16 * 1024:0]u8 align(16) linksection(".bss") = undefine
 export const header linksection(".stivale2hdr") = zigvale.Header{
     // The stack address for when the kernel is loaded. On x86, the stack grows downwards, and so
     // we pass a pointer to the top of the stack.
-    .stack = &stack_bytes[stack_bytes.len],
+    // TODO workaround for ziglang/zig#12240
+    //.stack = &stack_bytes[stack_bytes.len],
+    .stack = &stack_bytes[@sizeOf(@TypeOf(stack_bytes)) - 1],
 
     // These flags communicate options to the bootloader
     .flags = .{
