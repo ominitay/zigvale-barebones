@@ -6,7 +6,7 @@ const zigvale = @import("zigvale").v2;
 export var stack_bytes: [16 * 1024:0]u8 align(16) linksection(".bss") = undefined;
 
 // This is the stivale2 header. Contained in the ELF section named '.stivale2hdr', it is detected
-// by a stivale2-compatible bootloader, and provides the stack pointer, flags, tags, and entry point.
+// by a stivale2-compatible bootloader, and provides the stack pointer, flags, tags, and (optionally) entry point.
 export const header linksection(".stivale2hdr") = zigvale.Header{
     // The stack address for when the kernel is loaded. On x86, the stack grows downwards, and so
     // we pass a pointer to the top of the stack.
@@ -23,7 +23,6 @@ export const header linksection(".stivale2hdr") = zigvale.Header{
     // Pointer to the first in a linked list of tags.
     // Tags communicate to the bootloader various options which your kernel requires.
     .tags = &term_tag.tag,
-    .entry_point = entry,
 };
 
 // This tag tells the bootloader to set up a terminal for your kernel to use
@@ -34,12 +33,14 @@ const term_tag = zigvale.Header.TerminalTag{
 // This tag tells the bootloader to select the best possible video mode
 const fb_tag = zigvale.Header.FramebufferTag{};
 
-// This generates the entry point for your kernel.
-// Note: this function is not exported as `_start` -- the kernel in-fact has no entry point.
-// Stivale2-compatible bootloaders are capable of using the pointer to the 'entry point' in
+// This generates and exports the entry point for the kernel.
+// Stivale2-compatible bootloaders are capable of using the pointer to the entry point in
 // zigvale.Header. This has the benefit of allowing you to add support for multiple bootloader
-// protocols, without entry points conflicting with one another.
-const entry = zigvale.entryPoint(kmain);
+// protocols, using multiple entry points.
+comptime {
+    const entry = zigvale.entryPoint(kmain);
+    @export(entry, .{ .name = "_start", .linkage = .Strong });
+}
 
 // This is the definition of your main kernel function.
 // The generated entry point passes the parsed stivale2 structure.
